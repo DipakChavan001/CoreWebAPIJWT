@@ -4,6 +4,7 @@ using CoreWebAPIJWT.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreWebAPIJWT.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240408104319_InsertData")]
+    partial class InsertData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +73,7 @@ namespace CoreWebAPIJWT.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 4, 8, 16, 18, 6, 854, DateTimeKind.Local).AddTicks(8781),
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Details = "Focus 11 tincidunt maximus leo and sed scelerious .Beautiful Desinged Created thats has very Old strcture.",
                             ImageUrl = "https://unsplash.com/photos/a-laptop-and-a-potted-plant-IqBY9blj8Ks",
                             Name = "Royal Villa",
@@ -83,7 +86,7 @@ namespace CoreWebAPIJWT.Migrations
                         {
                             Id = 2,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 4, 8, 16, 18, 6, 854, DateTimeKind.Local).AddTicks(8796),
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Details = "Beautiful Desinged Created thats has very Old strcture.",
                             ImageUrl = "https://unsplash.com/photos/macbook-pro-on-top-of-brown-table-1SAnrIxw5OY",
                             Name = "Royal Pool",
@@ -96,7 +99,7 @@ namespace CoreWebAPIJWT.Migrations
                         {
                             Id = 3,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 4, 8, 16, 18, 6, 854, DateTimeKind.Local).AddTicks(8798),
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Details = "Beautiful Desinged Created thats has very Old strcture.",
                             ImageUrl = "https://unsplash.com/photos/a-woman-sitting-on-a-couch-using-a-laptop-computer-IhO7j8qEaVc",
                             Name = "Royal split Villa",
@@ -109,7 +112,7 @@ namespace CoreWebAPIJWT.Migrations
                         {
                             Id = 4,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 4, 8, 16, 18, 6, 854, DateTimeKind.Local).AddTicks(8799),
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Details = "Beautiful Desinged Created thats has very Old strcture.",
                             ImageUrl = "https://unsplash.com/photos/apple-macbook-beside-computer-mouse-on-table-9l_326FISzk",
                             Name = "Diamond Villa",
@@ -122,7 +125,7 @@ namespace CoreWebAPIJWT.Migrations
                         {
                             Id = 5,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 4, 8, 16, 18, 6, 854, DateTimeKind.Local).AddTicks(8801),
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Details = "Beautiful Desinged Created thats has very Old strcture.",
                             ImageUrl = "https://unsplash.com/photos/a-laptop-and-a-potted-plant-IqBY9blj8Ks",
                             Name = "Diamond Pool Villa",
