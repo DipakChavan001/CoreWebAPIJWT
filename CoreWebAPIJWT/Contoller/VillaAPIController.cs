@@ -30,10 +30,12 @@ namespace CoreWebAPIJWT.Contoller
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<VillaDTO>> GetVillas()
+        //async await default syntax
+
+        public async Task<ActionResult<IEnumerable<VillaDTO>>>GetVillas()
         {
             //Log("Getting All Villas.", "");
-            return Ok(_dbContext.Villas.ToList());
+            return Ok(await _dbContext.Villas.ToListAsync());
         }
 
         //to retrive a particuler villa
@@ -45,7 +47,7 @@ namespace CoreWebAPIJWT.Contoller
         //[ProducesResponseType(200)]
         //[ProducesResponseType(400)]
         //[ProducesResponseType(404)]
-        public ActionResult<VillaDTO> GetVilla(int id)
+        public async Task<ActionResult<VillaDTO>> GetVilla(int id)
         {
             //checking validation
             if (id == 0)
@@ -53,7 +55,7 @@ namespace CoreWebAPIJWT.Contoller
                 //Log("Get Villa Error with Id"+id, "error");
                 return BadRequest();
             }
-            var v = _dbContext.Villas.FirstOrDefault(w => w.Id == id);
+            var v =await _dbContext.Villas.FirstOrDefaultAsync(w => w.Id == id);
             if (v == null)
             {
                 return NotFound();
@@ -68,11 +70,11 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaCreateDTO villaDTO)
+        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody] VillaCreateDTO villaDTO)
         {
            
             //Custome Validation
-            if (_dbContext.Villas.ToList().FirstOrDefault(u => u.Name.ToLower() == villaDTO.Name.ToLower()) != null)
+            if (await _dbContext.Villas.FirstOrDefaultAsync(u => u.Name.ToLower() == villaDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("Custome Error", "Villa is Already Exists");
                 return BadRequest(ModelState);
@@ -95,8 +97,9 @@ namespace CoreWebAPIJWT.Contoller
                 Sqft = villaDTO.Sqft,
 
             };
-            _dbContext.Villas.Add(model);
-            _dbContext.SaveChanges();
+            await _dbContext.Villas.AddAsync(model);
+
+           await _dbContext.SaveChangesAsync();
 
             return CreatedAtRoute("GetVilla", new { id = model.Id }, model);
         }
@@ -151,13 +154,14 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
-        public ActionResult<VillaDTO> DeleteVillaById(int id)
+        public async Task<ActionResult<VillaDTO>> DeleteVillaById(int id)
         {
             //checking validation
             if (id == 0)
             {
                 return BadRequest();
             }
+            //hard coded value
             ////var v=Villastore.villaList.FirstorDefault(u=>u.Id==id);          
 
             //if (v == null)
@@ -166,13 +170,14 @@ namespace CoreWebAPIJWT.Contoller
 
             //}
             //VillaStore.VillaList.Remove(v);
-            var v = _dbContext.Villas.ToList().FirstOrDefault(w => w.Id == id);
+            //var v = _dbContext.Villas.ToList().FirstOrDefault(w => w.Id == id);
+            var v =await  _dbContext.Villas.FirstOrDefaultAsync(w => w.Id == id);
             if (v == null)
             {
                 return NoContent();
             }
             _dbContext.Villas.Remove(v);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return NoContent();
         }
 
@@ -181,7 +186,7 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("{id:int}", Name = "UpdateVilla")]
 
-        public IActionResult UpdateVilla(int id, [FromBody] VillaUpdateDTO villaDTO)
+        public async Task<IActionResult> UpdateVilla(int id, [FromBody] VillaUpdateDTO villaDTO)
         {
             if (villaDTO == null || id != villaDTO.Id)
             {
@@ -206,7 +211,7 @@ namespace CoreWebAPIJWT.Contoller
 
             };
             _dbContext.Villas.Update(model);
-            _dbContext.SaveChanges();
+           await _dbContext.SaveChangesAsync();
 
             return NoContent();
 
@@ -249,7 +254,7 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patchDTO)
+        public async Task<IActionResult> UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patchDTO)
         {
             //validate the id
             if (patchDTO == null || id == 0)
@@ -269,7 +274,7 @@ namespace CoreWebAPIJWT.Contoller
 
             //using EF
             //creteical with EF with no tracking of id
-            var villa = _dbContext.Villas.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            var villa =await _dbContext.Villas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
             //villa.Name = "new name";
             //_dbContext.SaveChanges();
@@ -305,7 +310,7 @@ namespace CoreWebAPIJWT.Contoller
 
             };
             _dbContext.Villas.Update(model);
-            _dbContext.SaveChanges();
+           await _dbContext.SaveChangesAsync();
 
             if (!ModelState.IsValid)
             {
