@@ -68,12 +68,9 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaDTO villaDTO)
+        public ActionResult<VillaDTO> CreateVilla([FromBody] VillaCreateDTO villaDTO)
         {
-            //if(ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
+           
             //Custome Validation
             if (_dbContext.Villas.ToList().FirstOrDefault(u => u.Name.ToLower() == villaDTO.Name.ToLower()) != null)
             {
@@ -84,22 +81,14 @@ namespace CoreWebAPIJWT.Contoller
             {
                 return BadRequest(villaDTO);
             }
-            if (villaDTO.Id > 0)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-
-            }
-            //villaDTO.Id = VillaStore.VillaList.OrderByDescending(w => w.Id).FirstOrDefault().Id + 1;            
-            //VillaStore.VillaList.Add(villaDTO);
-            //
+            
 
             //enter the data mapping to tables by using a enetity framework
             Villa model = new()
             {
                 Amenity = villaDTO.Amenity,
                 Details = villaDTO.Details,
-                Occupancy = villaDTO.Occupancy,
-                Id = villaDTO.Id,
+                Occupancy = villaDTO.Occupancy,              
                 ImageUrl = villaDTO.ImageUrl,
                 Name = villaDTO.Name,
                 Rate = villaDTO.Rate,
@@ -109,10 +98,55 @@ namespace CoreWebAPIJWT.Contoller
             _dbContext.Villas.Add(model);
             _dbContext.SaveChanges();
 
-            return CreatedAtRoute("GetVilla", new { id = villaDTO.Id }, villaDTO);
+            return CreatedAtRoute("GetVilla", new { id = model.Id }, model);
         }
+
+
+        //public ActionResult<VillaDTO> CreateVilla([FromBody] VillaDTO villaDTO)
+        //{
+        //    //if(ModelState.IsValid)
+        //    //{
+        //    //    return BadRequest(ModelState);
+        //    //}
+        //    //Custome Validation
+        //    if (_dbContext.Villas.ToList().FirstOrDefault(u => u.Name.ToLower() == villaDTO.Name.ToLower()) != null)
+        //    {
+        //        ModelState.AddModelError("Custome Error", "Villa is Already Exists");
+        //        return BadRequest(ModelState);
+        //    }
+        //    if (villaDTO == null)
+        //    {
+        //        return BadRequest(villaDTO);
+        //    }
+        //    if (villaDTO.Id > 0)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+
+        //    }
+        //    //villaDTO.Id = VillaStore.VillaList.OrderByDescending(w => w.Id).FirstOrDefault().Id + 1;            
+        //    //VillaStore.VillaList.Add(villaDTO);
+        //    //
+
+        //    //enter the data mapping to tables by using a enetity framework
+        //    Villa model = new()
+        //    {
+        //        Amenity = villaDTO.Amenity,
+        //        Details = villaDTO.Details,
+        //        Occupancy = villaDTO.Occupancy,
+        //        Id = villaDTO.Id,
+        //        ImageUrl = villaDTO.ImageUrl,
+        //        Name = villaDTO.Name,
+        //        Rate = villaDTO.Rate,
+        //        Sqft = villaDTO.Sqft,
+
+        //    };
+        //    _dbContext.Villas.Add(model);
+        //    _dbContext.SaveChanges();
+
+        //    return CreatedAtRoute("GetVilla", new { id = villaDTO.Id }, villaDTO);
+        //}
         //delete the data by id
-        
+
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -146,7 +180,8 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status204NoContent)]//showimg the status of requests
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("{id:int}", Name = "UpdateVilla")]
-        public IActionResult UpdateVilla(int id, [FromBody] VillaDTO villaDTO)
+
+        public IActionResult UpdateVilla(int id, [FromBody] VillaUpdateDTO villaDTO)
         {
             if (villaDTO == null || id != villaDTO.Id)
             {
@@ -177,11 +212,43 @@ namespace CoreWebAPIJWT.Contoller
 
 
         }
+        //public IActionResult UpdateVilla(int id, [FromBody] VillaDTO villaDTO)
+        //{
+        //    if (villaDTO == null || id != villaDTO.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    //var v = VillaStore.VillaList.FirstOrDefault(w => w.Id == id);
+        //    //v.Name = villaDTO.Name;
+        //    //v.Sqft = villaDTO.Sqft;
+        //    //v.Occupancy = villaDTO.Occupancy;
+
+        //    //using entity framework
+        //    Villa model = new()
+        //    {
+        //        Amenity = villaDTO.Amenity,
+        //        Details = villaDTO.Details,
+        //        Occupancy = villaDTO.Occupancy,
+        //        Id = villaDTO.Id,
+        //        ImageUrl = villaDTO.ImageUrl,
+        //        Name = villaDTO.Name,
+        //        Rate = villaDTO.Rate,
+        //        Sqft = villaDTO.Sqft,
+
+        //    };
+        //    _dbContext.Villas.Update(model);
+        //    _dbContext.SaveChanges();
+
+        //    return NoContent();
+
+
+        //}
 
         [HttpPatch("{id:int}", Name = "UpdatePartialVilla")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patchDTO)
         {
             //validate the id
@@ -202,7 +269,7 @@ namespace CoreWebAPIJWT.Contoller
 
             //using EF
             //creteical with EF with no tracking of id
-            var villa=_dbContext.Villas.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            var villa = _dbContext.Villas.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
             //villa.Name = "new name";
             //_dbContext.SaveChanges();
@@ -223,7 +290,7 @@ namespace CoreWebAPIJWT.Contoller
             {
                 return BadRequest();
             }
-            patchDTO.ApplyTo(dto, ModelState);           
+            patchDTO.ApplyTo(dto, ModelState);
 
             Villa model = new()
             {
