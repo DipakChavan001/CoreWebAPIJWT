@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoreWebAPIJWT.Contoller
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class VillaAPIController : ControllerBase
     {   //custome logger
@@ -84,7 +84,7 @@ namespace CoreWebAPIJWT.Contoller
             {
                 return BadRequest(villaDTO);
             }
-            if (villaDTO.Id == 0)
+            if (villaDTO.Id > 0)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
@@ -112,7 +112,7 @@ namespace CoreWebAPIJWT.Contoller
             return CreatedAtRoute("GetVilla", new { id = villaDTO.Id }, villaDTO);
         }
         //delete the data by id
-        [HttpPost]
+        
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -201,8 +201,12 @@ namespace CoreWebAPIJWT.Contoller
             //}
 
             //using EF
+            //creteical with EF with no tracking of id
+            var villa=_dbContext.Villas.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
-            var villa=_dbContext.Villas.FirstOrDefault(x => x.Id == id);
+            //villa.Name = "new name";
+            //_dbContext.SaveChanges();
+
             VillaDTO dto = new()
             {
                 Amenity = villa.Amenity,
@@ -219,11 +223,7 @@ namespace CoreWebAPIJWT.Contoller
             {
                 return BadRequest();
             }
-            patchDTO.ApplyTo(dto, ModelState);
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            patchDTO.ApplyTo(dto, ModelState);           
 
             Villa model = new()
             {
@@ -239,6 +239,11 @@ namespace CoreWebAPIJWT.Contoller
             };
             _dbContext.Villas.Update(model);
             _dbContext.SaveChanges();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             return NoContent();
 
