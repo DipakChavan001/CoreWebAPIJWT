@@ -111,9 +111,7 @@ namespace CoreWebAPIJWT.Contoller
             //};
             await _dbVilla.CreateAsync(model);
 
-           await _dbVilla.SaveAsync();
-
-            return CreatedAtRoute("GetVilla", new { id = model.Id }, model);
+           return CreatedAtRoute("GetVilla", new { id = model.Id }, model);
         }
 
 
@@ -225,8 +223,6 @@ namespace CoreWebAPIJWT.Contoller
 
             //};
              await _dbVilla.UpdateAsync(model);
-            await _dbVilla.SaveAsync();
-
             return NoContent();
 
 
@@ -330,8 +326,7 @@ namespace CoreWebAPIJWT.Contoller
 
             //};
            await _dbVilla.UpdateAsync(model);
-           await _dbVilla.SaveAsync();
-
+           
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
