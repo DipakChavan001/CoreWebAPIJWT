@@ -16,13 +16,13 @@ namespace CoreWebAPIJWT.Repository
          _db=db;
         }
 
-        public async Task Create(Villa entity)
+        public async Task CreateAsync(Villa entity)
         {
             await _db.Villas.AddAsync(entity);
-            await Save();
+            await SaveAsync();
         }
 
-        public  async Task<Villa> Get(Expression<Func<Villa,bool>> filter = null, bool tracked = true)
+        public  async Task<Villa> GetAsync(Expression<Func<Villa,bool>> filter = null, bool tracked = true)
         {
             IQueryable<Villa> query = _db.Villas;
             if(!tracked)
@@ -36,7 +36,7 @@ namespace CoreWebAPIJWT.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<Villa>> GetAll(Expression<Func<Villa,bool>> filter = null)
+        public async Task<List<Villa>> GetAllAsync(Expression<Func<Villa,bool>> filter = null)
         {
             IQueryable<Villa> query=_db.Villas;
             if (filter!=null)
@@ -46,20 +46,24 @@ namespace CoreWebAPIJWT.Repository
             return await query.ToListAsync();
         }
 
-        public async Task Remove(Villa entity)
+        public async Task RemoveAsync(Villa entity)
         {
             _db.Villas.Remove(entity);
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task Save()
+        public async Task SaveAsync()
         {
             await _db.SaveChangesAsync();    
         }
 
-        Task<List<Villa>> IVillaRepository.Get(Expression<Func<Villa, bool>> filter, bool tracked)
+       
+
+        public async Task UpdateAsync(Villa entity)
         {
-            throw new NotImplementedException();
+            _db.Villas.Update(entity);
+            await SaveAsync();
+
         }
     }
 }

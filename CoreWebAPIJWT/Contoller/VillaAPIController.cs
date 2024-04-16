@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using CoreWebAPIJWT.Repository.IRepository;
 
 namespace CoreWebAPIJWT.Contoller
 {
@@ -25,11 +26,13 @@ namespace CoreWebAPIJWT.Contoller
 
 
         //use dependency injection  extract services
-        private readonly ApplicationDBContext _dbContext;
+        //private readonly ApplicationDBContext _dbContext;
+        private readonly IVillaRepository _dbVilla;
         private readonly IMapper _mapper;
-        public VillaAPIController(ApplicationDBContext dbContext,IMapper mapper)
+        //public VillaAPIController(ApplicationDBContext dbContext,IMapper mapper)
+        public VillaAPIController(IVillaRepository dbVilla, IMapper mapper)
         {
-            _dbContext = dbContext;
+            _dbVilla= dbVilla;
             _mapper=mapper;
         }
         [HttpGet]
@@ -40,8 +43,8 @@ namespace CoreWebAPIJWT.Contoller
         {
             //Log("Getting All Villas.", "");
             //return Ok(await _dbContext.Villas.ToListAsync());
-
-            IEnumerable<Villa> villaList = await _dbContext.Villas.ToListAsync();
+            //IEnumerable<Villa> villaList = await _dbContext.Villas.ToListAsync();
+            IEnumerable<Villa> villaList = await _dbVilla.GetAllAsync();
             return Ok(_mapper.Map<List<VillaDTO>>(villaList));
         }
 
@@ -62,7 +65,8 @@ namespace CoreWebAPIJWT.Contoller
                 //Log("Get Villa Error with Id"+id, "error");
                 return BadRequest();
             }
-            var v =await _dbContext.Villas.FirstOrDefaultAsync(w => w.Id == id);
+            //var v =await _dbContext.Villas.FirstOrDefaultAsync(w => w.Id == id);
+            var v = await _dbVilla.GetAsync(w => w.Id == id);
             if (v == null)
             {
                 return NotFound();
@@ -81,7 +85,7 @@ namespace CoreWebAPIJWT.Contoller
         {
            
             //Custome Validation
-            if (await _dbContext.Villas.FirstOrDefaultAsync(u => u.Name.ToLower() == CreateDTO.Name.ToLower()) != null)
+            if (await _dbVilla.GetAsync(u => u.Name.ToLower() == CreateDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("Custome Error", "Villa is Already Exists");
                 return BadRequest(ModelState);
@@ -105,9 +109,9 @@ namespace CoreWebAPIJWT.Contoller
             //    Sqft = villaCreateDTO.Sqft,
 
             //};
-            await _dbContext.Villas.AddAsync(model);
+            await _dbVilla.CreateAsync(model);
 
-           await _dbContext.SaveChangesAsync();
+           await _dbVilla.SaveAsync();
 
             return CreatedAtRoute("GetVilla", new { id = model.Id }, model);
         }
@@ -162,7 +166,7 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
-        public async Task<ActionResult<VillaDTO>> DeleteVillaById(int id)
+        public async Task<ActionResult<VillaDTO>> DeleteVilla(int id)
         {
             //checking validation
             if (id == 0)
@@ -179,13 +183,12 @@ namespace CoreWebAPIJWT.Contoller
             //}
             //VillaStore.VillaList.Remove(v);
             //var v = _dbContext.Villas.ToList().FirstOrDefault(w => w.Id == id);
-            var v =await  _dbContext.Villas.FirstOrDefaultAsync(w => w.Id == id);
-            if (v == null)
+            var villa =await  _dbVilla.GetAsync(w => w.Id == id);
+            if (villa == null)
             {
                 return NoContent();
             }
-            _dbContext.Villas.Remove(v);
-            await _dbContext.SaveChangesAsync();
+            await _dbVilla.RemoveAsync(villa);
             return NoContent();
         }
 
@@ -221,8 +224,8 @@ namespace CoreWebAPIJWT.Contoller
             //    Sqft = villaDTO.Sqft,
 
             //};
-            _dbContext.Villas.Update(model);
-           await _dbContext.SaveChangesAsync();
+             await _dbVilla.UpdateAsync(model);
+            await _dbVilla.SaveAsync();
 
             return NoContent();
 
@@ -285,7 +288,7 @@ namespace CoreWebAPIJWT.Contoller
 
             //using EF
             //creteical with EF with no tracking of id
-            var villa =await _dbContext.Villas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var villa =await _dbVilla.GetAsync(x => x.Id == id,tracked:false);
 
             //villa.Name = "new name";
             //_dbContext.SaveChanges();
@@ -326,8 +329,8 @@ namespace CoreWebAPIJWT.Contoller
             //    Sqft = dto.Sqft,
 
             //};
-            _dbContext.Villas.Update(model);
-           await _dbContext.SaveChangesAsync();
+           await _dbVilla.UpdateAsync(model);
+           await _dbVilla.SaveAsync();
 
             if (!ModelState.IsValid)
             {

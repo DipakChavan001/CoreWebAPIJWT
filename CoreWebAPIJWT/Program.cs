@@ -1,6 +1,8 @@
 //using CoreWebAPIJWT.Logging;
 using CoreWebAPIJWT;
 using CoreWebAPIJWT.Data;
+using CoreWebAPIJWT.Repository;
+using CoreWebAPIJWT.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("MyConn"));
 });
 
+//Register repository here
+builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 //autoupdate mapping of DTOs
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
