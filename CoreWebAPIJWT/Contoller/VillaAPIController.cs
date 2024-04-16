@@ -1,4 +1,5 @@
-﻿using CoreWebAPIJWT.Data;
+﻿using AutoMapper;
+using CoreWebAPIJWT.Data;
 //using CoreWebAPIJWT.Logging;
 using CoreWebAPIJWT.Models;
 using CoreWebAPIJWT.Models.DTO;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace CoreWebAPIJWT.Contoller
 {
@@ -24,9 +26,11 @@ namespace CoreWebAPIJWT.Contoller
 
         //use dependency injection  extract services
         private readonly ApplicationDBContext _dbContext;
-        public VillaAPIController(ApplicationDBContext dbContext)
+        private readonly IMapper _mapper;
+        public VillaAPIController(ApplicationDBContext dbContext,IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper=mapper;
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,7 +39,10 @@ namespace CoreWebAPIJWT.Contoller
         public async Task<ActionResult<IEnumerable<VillaDTO>>>GetVillas()
         {
             //Log("Getting All Villas.", "");
-            return Ok(await _dbContext.Villas.ToListAsync());
+            //return Ok(await _dbContext.Villas.ToListAsync());
+
+            IEnumerable<Villa> villaList = await _dbContext.Villas.ToListAsync();
+            return Ok(_mapper.Map<List<VillaDTO>>(villaList));
         }
 
         //to retrive a particuler villa
@@ -61,7 +68,7 @@ namespace CoreWebAPIJWT.Contoller
                 return NotFound();
 
             }
-            return Ok(v);
+            return Ok(_mapper.Map<VillaDTO>(v));
         }
 
 
@@ -70,33 +77,34 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody] VillaCreateDTO villaDTO)
+        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody] VillaCreateDTO CreateDTO)
         {
            
             //Custome Validation
-            if (await _dbContext.Villas.FirstOrDefaultAsync(u => u.Name.ToLower() == villaDTO.Name.ToLower()) != null)
+            if (await _dbContext.Villas.FirstOrDefaultAsync(u => u.Name.ToLower() == CreateDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("Custome Error", "Villa is Already Exists");
                 return BadRequest(ModelState);
             }
-            if (villaDTO == null)
+            if (CreateDTO == null)
             {
-                return BadRequest(villaDTO);
+                return BadRequest(CreateDTO);
             }
             
+            //its automatically maps all properties of DTO
+            Villa model = _mapper.Map<Villa>(CreateDTO);
 
-            //enter the data mapping to tables by using a enetity framework
-            Villa model = new()
-            {
-                Amenity = villaDTO.Amenity,
-                Details = villaDTO.Details,
-                Occupancy = villaDTO.Occupancy,              
-                ImageUrl = villaDTO.ImageUrl,
-                Name = villaDTO.Name,
-                Rate = villaDTO.Rate,
-                Sqft = villaDTO.Sqft,
+            //Villa model = new()
+            //{
+            //    Amenity = villaCreateDTO.Amenity,
+            //    Details = villaCreateDTO.Details,
+            //    Occupancy = villaCreateDTO.Occupancy,
+            //    ImageUrl = villaCreateDTO.ImageUrl,
+            //    Name = villaCreateDTO.Name,
+            //    Rate = villaCreateDTO.Rate,
+            //    Sqft = villaCreateDTO.Sqft,
 
-            };
+            //};
             await _dbContext.Villas.AddAsync(model);
 
            await _dbContext.SaveChangesAsync();
@@ -186,9 +194,9 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("{id:int}", Name = "UpdateVilla")]
 
-        public async Task<IActionResult> UpdateVilla(int id, [FromBody] VillaUpdateDTO villaDTO)
+        public async Task<IActionResult> UpdateVilla(int id, [FromBody] VillaUpdateDTO UpdateDTO)
         {
-            if (villaDTO == null || id != villaDTO.Id)
+            if (UpdateDTO == null || id != UpdateDTO.Id)
             {
                 return BadRequest();
             }
@@ -197,19 +205,22 @@ namespace CoreWebAPIJWT.Contoller
             //v.Sqft = villaDTO.Sqft;
             //v.Occupancy = villaDTO.Occupancy;
 
-            //using entity framework
-            Villa model = new()
-            {
-                Amenity = villaDTO.Amenity,
-                Details = villaDTO.Details,
-                Occupancy = villaDTO.Occupancy,
-                Id = villaDTO.Id,
-                ImageUrl = villaDTO.ImageUrl,
-                Name = villaDTO.Name,
-                Rate = villaDTO.Rate,
-                Sqft = villaDTO.Sqft,
+            //its automatically maps all properties of DTO
+            Villa model = _mapper.Map<Villa>(UpdateDTO);
 
-            };
+            //using entity framework
+            //Villa model = new()
+            //{
+            //    Amenity = villaDTO.Amenity,
+            //    Details = villaDTO.Details,
+            //    Occupancy = villaDTO.Occupancy,
+            //    Id = villaDTO.Id,
+            //    ImageUrl = villaDTO.ImageUrl,
+            //    Name = villaDTO.Name,
+            //    Rate = villaDTO.Rate,
+            //    Sqft = villaDTO.Sqft,
+
+            //};
             _dbContext.Villas.Update(model);
            await _dbContext.SaveChangesAsync();
 
@@ -254,7 +265,7 @@ namespace CoreWebAPIJWT.Contoller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
 
-        public async Task<IActionResult> UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patchDTO)
+        public async Task<IActionResult> UpdatePartialVilla(int id, JsonPatchDocument<VillaUpdateDTO> patchDTO)
         {
             //validate the id
             if (patchDTO == null || id == 0)
@@ -279,36 +290,42 @@ namespace CoreWebAPIJWT.Contoller
             //villa.Name = "new name";
             //_dbContext.SaveChanges();
 
-            VillaDTO dto = new()
-            {
-                Amenity = villa.Amenity,
-                Details = villa.Details,
-                Occupancy = villa.Occupancy,
-                Id = villa.Id,
-                ImageUrl = villa.ImageUrl,
-                Name = villa.Name,
-                Rate = villa.Rate,
-                Sqft = villa.Sqft,
+            //its automatically maps all properties of DTO
+            VillaUpdateDTO DTO = _mapper.Map<VillaUpdateDTO>(villa);           
 
-            };
-            if (villa == null)
+
+            //VillaDTO dto = new()
+            //{
+            //    Amenity = villa.Amenity,
+            //    Details = villa.Details,
+            //    Occupancy = villa.Occupancy,
+            //    Id = villa.Id,
+            //    ImageUrl = villa.ImageUrl,
+            //    Name = villa.Name,
+            //    Rate = villa.Rate,
+            //    Sqft = villa.Sqft,
+
+            //};
+            if (villa  == null)
             {
                 return BadRequest();
             }
-            patchDTO.ApplyTo(dto, ModelState);
+            patchDTO.ApplyTo(DTO, ModelState);           
 
-            Villa model = new()
-            {
-                Amenity = dto.Amenity,
-                Details = dto.Details,
-                Occupancy = dto.Occupancy,
-                Id = dto.Id,
-                ImageUrl = dto.ImageUrl,
-                Name = dto.Name,
-                Rate = dto.Rate,
-                Sqft = dto.Sqft,
+            Villa model =_mapper.Map<Villa>(DTO);
 
-            };
+            //Villa model = new()
+            //{
+            //    Amenity = dto.Amenity,
+            //    Details = dto.Details,
+            //    Occupancy = dto.Occupancy,
+            //    Id = dto.Id,
+            //    ImageUrl = dto.ImageUrl,
+            //    Name = dto.Name,
+            //    Rate = dto.Rate,
+            //    Sqft = dto.Sqft,
+
+            //};
             _dbContext.Villas.Update(model);
            await _dbContext.SaveChangesAsync();
 

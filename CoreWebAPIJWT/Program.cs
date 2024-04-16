@@ -1,4 +1,5 @@
 //using CoreWebAPIJWT.Logging;
+using CoreWebAPIJWT;
 using CoreWebAPIJWT.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -18,7 +19,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDBContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("MyConn"));
-    });
+});
+
+//autoupdate mapping of DTOs
+builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 
 builder.Services.AddControllers(option =>
@@ -40,6 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 
