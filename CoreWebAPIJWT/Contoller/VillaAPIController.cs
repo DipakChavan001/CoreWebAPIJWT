@@ -207,7 +207,7 @@ namespace CoreWebAPIJWT.Contoller
         //    return CreatedAtRoute("GetVilla", new { id = villaDTO.Id }, villaDTO);
         //}
         //delete the data by id
-
+     
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

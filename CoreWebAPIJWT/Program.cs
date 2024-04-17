@@ -23,8 +23,9 @@ builder.Services.AddDbContext<ApplicationDBContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("MyConn"));
 });
 
-//Register repository here
+//Register repository here 
 builder.Services.AddScoped<IVillaRepository, VillaRepository>();
+builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
 //autoupdate mapping of DTOs
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
@@ -55,5 +56,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
