@@ -52,7 +52,7 @@ namespace CoreWebAPIJWT.Contoller
             {
                 if (id == 0) 
                 {
-                _response.StatusCode=HttpStatusCode.BadRequest;
+                    _response.StatusCode=HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
                 var villa=await _dbVillaNumber.GetAsync(w=>w.VillaNo==id);
@@ -62,7 +62,7 @@ namespace CoreWebAPIJWT.Contoller
                     return NotFound(_response);
                 }
 
-                _response.Result=_mapper.Map<List<VillaNumberDTO>>(villa);
+                _response.Result=_mapper.Map<VillaNumberDTO>(villa);
                 _response.StatusCode = HttpStatusCode.OK;
                  return Ok(villa);
 
@@ -107,7 +107,7 @@ namespace CoreWebAPIJWT.Contoller
             return _response;
         }
 
-        [HttpDelete("{id:int}", Name = "DeleteVilla")]
+        [HttpDelete("{id:int}", Name = "DeleteVillaNumber")]
         public async Task<ActionResult<VillaNumberDTO>> DeleteVillaNumber(int id)
         {
             try
@@ -138,8 +138,8 @@ namespace CoreWebAPIJWT.Contoller
             return Ok(_response);
         }
 
-        [HttpPut("{id:int}", Name = "UpdateVilla")]
-        public  async Task<ActionResult<APIResponse>> UpdateAll(int id, [FromBody] VillaNumberUpdateDTO NumberUpdateDTO )
+        [HttpPut("{id:int}", Name = "UpdateVillaNumber")]
+        public  async Task<ActionResult<APIResponse>> UpdateVillaNumber(int id, [FromBody] VillaNumberUpdateDTO NumberUpdateDTO )
         {
             try
             {
@@ -163,8 +163,8 @@ namespace CoreWebAPIJWT.Contoller
             return _response;
         }
 
-        [HttpPatch("{id:int}", Name = "UpdatePartialVilla")]
-        public async Task<ActionResult<APIResponse>> UpdatePartial(int id, JsonPatchDocument<VillaNumberUpdateDTO> NumberUpdateDTO)
+        [HttpPatch("{id:int}", Name = "UpdatePartialVillaNumber")]
+        public async Task<ActionResult<APIResponse>> UpdatePartialVillaNumber(int id, JsonPatchDocument<VillaNumberUpdateDTO> NumberUpdateDTO)
         {
             try
             {

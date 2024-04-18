@@ -95,7 +95,7 @@ namespace CoreWebAPIJWT.Contoller
 
                 }
                 //return Ok(_mapper.Map<VillaDTO>(v));
-                _response.Result = _mapper.Map<List<VillaDTO>>(v);
+                _response.Result = _mapper.Map<VillaDTO>(v);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
