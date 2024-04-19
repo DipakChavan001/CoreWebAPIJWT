@@ -6,6 +6,9 @@ namespace CoreWebAPIJWT.Models.DTO
     {
         [Required]
         public int VillaNo { get; set; }
+        [Required]
+        public int ViillaId { get; set; }
         public string SpecialDetails { get; set; }
+        
     }
 }
