@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using CoreWebAPIJWT.Data;
 //using CoreWebAPIJWT.Logging;
 using CoreWebAPIJWT.Models;
@@ -14,6 +15,7 @@ using System.Net;
 namespace CoreWebAPIJWT.Contoller
 {
     [Route("api/[controller]/[action]")]
+
     [ApiController]
     public class VillaAPIController : ControllerBase
     {   //custome logger

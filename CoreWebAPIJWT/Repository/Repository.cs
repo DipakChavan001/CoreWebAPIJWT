@@ -7,9 +7,10 @@ namespace CoreWebAPIJWT.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        //used a dependency injections 
+        //used a dependency injections  as a constructor injections
         private readonly ApplicationDBContext _db;
         internal DbSet<T> dbSet;
+        //as a constructor injections
         public Repository(ApplicationDBContext db)
         {
             _db = db;
